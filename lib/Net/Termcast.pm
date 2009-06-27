@@ -71,7 +71,7 @@ has _sock => (
     lazy     => 1,
     default  => sub {
         my $self = shift;
-        my $socket = IO::Socket::Telnet->new(
+        my $socket = IO::Socket::Telnet::HalfDuplex->new(
             PeerAddr => $self->host,
             PeerPort => $self->port,
         );
@@ -129,8 +129,7 @@ sub screen {
 
 sub _get_screen {
     my $self = shift;
-    my $screen;
-    $self->_sock->recv($screen, 4096, 0);
+    my $screen = $self->_sock->read;
     $self->_vt->process($screen);
 }
 
