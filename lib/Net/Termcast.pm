@@ -106,9 +106,7 @@ sub select_session {
 sub screen_rows {
     my $self = shift;
     $self->_get_screen;
-    my @rows;
-    push @rows, $self->_vt->row_plaintext($_) for 1..$self->rows;
-    return @rows;
+    return map { $self->_vt->row_plaintext($_) } 1..$self->rows;
 }
 
 sub screen {
