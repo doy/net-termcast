@@ -106,7 +106,7 @@ sub refresh_menu {
 sub select_session {
     my $self = shift;
     my ($session) = @_;
-    return unless exists $self->sessions->{$session};
+    return unless $self->session($session);
     $self->_sock->send('q', 0) unless $self->location eq 'menu';
     $self->_sock->send($session, 0);
     $self->_get_screen;
