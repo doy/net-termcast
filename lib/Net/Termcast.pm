@@ -1,5 +1,6 @@
 package Net::Termcast;
 use Moose;
+use MooseX::AttributeHelpers;
 
 use IO::Socket::Telnet;
 use Term::VT102;
@@ -33,6 +34,18 @@ has in_menu => (
     isa      => 'Bool',
     default  => 0,
     init_arg => undef,
+);
+
+has sessions => (
+    traits   => ['Collection::ImmutableHash'],
+    is       => 'ro',
+    isa      => 'HashRef[Net::Termcast::Session]',
+    default  => sub { {} },
+    init_arg => undef,
+    provides => {
+        get    => 'session',
+        exists => 'has_session',
+    },
 );
 
 has _vt => (
@@ -77,9 +90,6 @@ sub refresh {
     $self->_get_menu;
 }
 
-sub sessions {
-}
-
 sub select_session {
     my $self = shift;
     my ($session) = @_;
@@ -117,7 +127,22 @@ sub _get_menu {
     $self->_parse_menu;
 }
 
+# XXX: need to handle multiple pages
 sub _parse_menu {
+    my $self = shift;
+    my %sessions;
+    for my $row ($self->rows) {
+        next unless $row =~ /^ ([a-z])\) (\w+) \(idle ([^,]+), connected ([^,]+), (\d+) viewers?, (\d+) bytes?\)/;
+        my ($session, $name, $idle, $connected, $viewers, $bytes) = ($1, $2, $3, $4, $5, $6);
+        $sessions{$session} = Net::Termcast::Session->new(
+            name      => $name,
+            idle      => $idle,
+            connected => $connected,
+            viewers   => $viewers,
+            bytes     => $bytes,
+        );
+    }
+    return \%sessions;
 }
 
 __PACKAGE__->meta->make_immutable;
