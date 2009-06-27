@@ -110,7 +110,6 @@ sub select_session {
     return unless $self->session($session);
     $self->_sock->send('q', 0) unless $self->location eq 'menu';
     $self->_sock->send($session, 0);
-    $self->_get_screen;
     $self->location($session);
 }
 
