@@ -39,6 +39,7 @@ has in_menu => (
 has sessions => (
     traits   => ['Collection::ImmutableHash'],
     is       => 'ro',
+    writer   => '_set_sessions',
     isa      => 'HashRef[Net::Termcast::Session]',
     default  => sub { {} },
     init_arg => undef,
@@ -143,7 +144,7 @@ sub _parse_menu {
             bytes     => $bytes,
         );
     }
-    return \%sessions;
+    $self->_set_sessions(\%sessions);
 }
 
 __PACKAGE__->meta->make_immutable;
