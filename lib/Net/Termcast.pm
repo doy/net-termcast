@@ -1,6 +1,7 @@
 package Net::Termcast;
 use Moose;
 use MooseX::AttributeHelpers;
+use Net::Termcast::Session;
 
 use IO::Socket::Telnet;
 use Term::VT102;
