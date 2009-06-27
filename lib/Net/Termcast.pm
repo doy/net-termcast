@@ -87,7 +87,7 @@ sub BUILD {
 
 sub refresh {
     my $self = shift;
-    $self->sock->send(' ', 0);
+    $self->_sock->send(' ', 0);
     $self->_get_menu;
 }
 
@@ -95,8 +95,8 @@ sub select_session {
     my $self = shift;
     my ($session) = @_;
     return unless exists $self->sessions->{$session};
-    $self->sock->send('q', 0) if $self->in_menu;
-    $self->sock->send($session, 0);
+    $self->_sock->send('q', 0) if $self->in_menu;
+    $self->_sock->send($session, 0);
     $self->_get_screen;
     $self->in_menu(0);
 }
@@ -105,7 +105,7 @@ sub select_session {
 sub screen_rows {
     my $self = shift;
     my @rows;
-    push @rows, $self->vt->row_plaintext($_) for 1..$self->rows;
+    push @rows, $self->_vt->row_plaintext($_) for 1..$self->rows;
     return @rows;
 }
 
@@ -117,8 +117,8 @@ sub screen {
 sub _get_screen {
     my $self = shift;
     my $screen;
-    $self->sock->recv($screen, 4096, 0);
-    $self->vt->process($screen);
+    $self->_sock->recv($screen, 4096, 0);
+    $self->_vt->process($screen);
 }
 
 sub _get_menu {
