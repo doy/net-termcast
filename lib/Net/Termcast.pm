@@ -29,10 +29,10 @@ has cols => (
     default => 80,
 );
 
-has in_menu => (
+has location => (
     is       => 'rw',
-    isa      => 'Bool',
-    default  => 0,
+    isa      => 'Str',
+    default  => 'menu',
     init_arg => undef,
 );
 
@@ -82,7 +82,6 @@ has _sock => (
 
 sub BUILD {
     my $self = shift;
-    $self->in_menu(1);
     $self->_get_menu;
 }
 
@@ -96,10 +95,10 @@ sub select_session {
     my $self = shift;
     my ($session) = @_;
     return unless exists $self->sessions->{$session};
-    $self->_sock->send('q', 0) if $self->in_menu;
+    $self->_sock->send('q', 0) unless $self->location eq 'menu';
     $self->_sock->send($session, 0);
     $self->_get_screen;
-    $self->in_menu(0);
+    $self->location($session);
 }
 
 # XXX: these two should use color at some point
@@ -123,7 +122,7 @@ sub _get_screen {
 
 sub _get_menu {
     my $self = shift;
-    return unless $self->in_menu;
+    return unless $self->location eq 'menu';
     $self->_get_screen;
     $self->_parse_menu;
 }
