@@ -81,8 +81,8 @@ has _sock => (
 
 sub BUILD {
     my $self = shift;
-    $self->_get_menu;
     $self->in_menu(1);
+    $self->_get_menu;
 }
 
 sub refresh {
