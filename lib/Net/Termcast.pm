@@ -64,7 +64,7 @@ has _vt => (
 
 has _sock => (
     is       => 'ro',
-    isa      => 'IO::Socket::Telnet'
+    isa      => 'IO::Socket::Telnet',
     lazy     => 1,
     default  => sub {
         my $self = shift;
@@ -86,6 +86,7 @@ sub BUILD {
 }
 
 sub refresh {
+    my $self = shift;
     $self->sock->send(' ', 0);
     $self->_get_menu;
 }
@@ -101,7 +102,7 @@ sub select_session {
 }
 
 # XXX: these two should use color at some point
-sub rows {
+sub screen_rows {
     my $self = shift;
     my @rows;
     push @rows, $self->row_plaintext($_) for 1..$self->rows;
@@ -110,7 +111,7 @@ sub rows {
 
 sub screen {
     my $self = shift;
-    return join "\n", $self->rows;
+    return join "\n", $self->screen_rows;
 }
 
 sub _get_screen {
@@ -131,7 +132,7 @@ sub _get_menu {
 sub _parse_menu {
     my $self = shift;
     my %sessions;
-    for my $row ($self->rows) {
+    for my $row ($self->screen_rows) {
         next unless $row =~ /^ ([a-z])\) (\w+) \(idle ([^,]+), connected ([^,]+), (\d+) viewers?, (\d+) bytes?\)/;
         my ($session, $name, $idle, $connected, $viewers, $bytes) = ($1, $2, $3, $4, $5, $6);
         $sessions{$session} = Net::Termcast::Session->new(
