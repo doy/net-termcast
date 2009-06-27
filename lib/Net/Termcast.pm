@@ -105,7 +105,7 @@ sub select_session {
 sub screen_rows {
     my $self = shift;
     my @rows;
-    push @rows, $self->row_plaintext($_) for 1..$self->rows;
+    push @rows, $self->vt->row_plaintext($_) for 1..$self->rows;
     return @rows;
 }
 
