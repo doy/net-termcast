@@ -91,6 +91,7 @@ sub refresh_menu {
     if ($self->location ne 'menu') {
         $name = $self->session($self->location)->name;
         $self->_sock->send('q', 0);
+        $self->location('menu');
     }
     $self->_sock->send(' ', 0);
     $self->_get_menu;
