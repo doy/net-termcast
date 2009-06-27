@@ -47,6 +47,7 @@ has sessions => (
         get    => 'session',
         exists => 'has_session',
         keys   => 'session_ids',
+        clear  => '_clear_sessions',
         set    => '_set_session',
     },
 );
@@ -143,7 +144,7 @@ sub _get_menu {
 # XXX: need to handle multiple pages
 sub _parse_menu {
     my $self = shift;
-    my %sessions;
+    $self->_clear_sessions;
     for my $row ($self->screen_rows) {
         next unless $row =~ /^ ([a-z])\) (\w+) \(idle ([^,]+), connected ([^,]+), (\d+) viewers?, (\d+) bytes?\)/;
         my ($session, $name, $idle, $connected, $viewers, $bytes) = ($1, $2, $3, $4, $5, $6);
