@@ -37,15 +37,16 @@ has location => (
 );
 
 has sessions => (
-    traits   => ['Collection::ImmutableHash'],
+    traits   => ['Collection::Hash'],
     is       => 'ro',
-    writer   => '_set_sessions',
     isa      => 'HashRef[Net::Termcast::Session]',
     default  => sub { {} },
     init_arg => undef,
     provides => {
         get    => 'session',
         exists => 'has_session',
+        keys   => 'session_ids',
+        set    => '_set_session',
     },
 );
 
@@ -96,7 +97,7 @@ sub refresh_menu {
     $self->_sock->send(' ', 0);
     $self->_get_menu;
     return unless $name;
-    for my $session (keys %{ $self->sessions }) {
+    for my $session ($self->session_ids) {
         if ($self->session($session)->name eq $name) {
             $self->select_session($session);
             return;
@@ -146,15 +147,15 @@ sub _parse_menu {
     for my $row ($self->screen_rows) {
         next unless $row =~ /^ ([a-z])\) (\w+) \(idle ([^,]+), connected ([^,]+), (\d+) viewers?, (\d+) bytes?\)/;
         my ($session, $name, $idle, $connected, $viewers, $bytes) = ($1, $2, $3, $4, $5, $6);
-        $sessions{$session} = Net::Termcast::Session->new(
-            name      => $name,
-            idle      => $idle,
-            connected => $connected,
-            viewers   => $viewers,
-            bytes     => $bytes,
-        );
+        $self->_set_session($session,
+                            Net::Termcast::Session->new(
+                                name      => $name,
+                                idle      => $idle,
+                                connected => $connected,
+                                viewers   => $viewers,
+                                bytes     => $bytes,
+                            ));
     }
-    $self->_set_sessions(\%sessions);
 }
 
 __PACKAGE__->meta->make_immutable;
