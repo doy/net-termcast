@@ -85,10 +85,22 @@ sub BUILD {
     $self->_get_menu;
 }
 
-sub refresh {
+sub refresh_menu {
     my $self = shift;
+    my $name;
+    if ($self->location ne 'menu') {
+        $name = $self->session($self->location)->name;
+        $self->_sock->send('q', 0);
+    }
     $self->_sock->send(' ', 0);
     $self->_get_menu;
+    return unless $name;
+    for my $session (keys %{ $self->sessions }) {
+        if ($self->session($session)->name eq $name) {
+            $self->select_session($session);
+            return;
+        }
+    }
 }
 
 sub select_session {
