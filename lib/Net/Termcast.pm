@@ -3,7 +3,7 @@ use Moose;
 use MooseX::AttributeHelpers;
 use Net::Termcast::Session;
 
-use IO::Socket::Telnet;
+use IO::Socket::Telnet::HalfDuplex;
 use Term::VT102;
 
 has host => (
@@ -68,7 +68,7 @@ has _vt => (
 
 has _sock => (
     is       => 'ro',
-    isa      => 'IO::Socket::Telnet',
+    isa      => 'IO::Socket::Telnet::HalfDuplex',
     lazy     => 1,
     default  => sub {
         my $self = shift;
